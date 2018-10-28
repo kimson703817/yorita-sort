@@ -1,0 +1,23 @@
+{
+  "name": "yorita-sort",
+  "version": "1.0.0",
+  "description": "backend for sorting application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sunny-yorita/yorita-sort.git"
+  },
+  "author": "sunny",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sunny-yorita/yorita-sort/issues"
+  },
+  "homepage": "https://github.com/sunny-yorita/yorita-sort#readme",
+  "dependencies": {
+    "express": "4.16.4",
+    "pg": "7.5.0"
+  }
+}

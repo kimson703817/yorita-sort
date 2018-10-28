@@ -1,0 +1,7 @@
+SELECT * from json_populate_record( NULL::userprofiles,
+    '{
+        "username": "helloworld",
+        "top5": ["Nina Ichihara", "Nono Morikubo"],
+        "plevel": 80
+    }'
+);
