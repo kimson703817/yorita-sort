@@ -1,11 +1,11 @@
-CREATE TYPE idol_type as ENUM ('Cute', 'Cool', 'Passion');
-CREATE TYPE blood_type as ENUM('A', 'B', 'AB', 'O');
+-- CREATE TYPE idol_type as ENUM ('Cute', 'Cool', 'Passion');
+-- CREATE TYPE blood_type as ENUM('A', 'B', 'AB', 'O');
 
-CREATE TABLE idols (
-    id SERIAL PRIMARY KEY,
-    name varchar(20),
-    type idol_type,
-    age int,
-    birthday DATE,
-    bloodtype blood_type
-);
+-- CREATE TABLE idols (
+--     id SERIAL PRIMARY KEY,
+--     name VARCHAR(20) UNIQUE,
+--     type idol_type,
+--     age INT,
+--     birthday DATE,
+--     bloodtype blood_type
+-- );
