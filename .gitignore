@@ -62,3 +62,6 @@ typings/
 
 # package lock
 package-lock.json
+
+# keys
+./config/keys.js

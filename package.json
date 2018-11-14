@@ -4,7 +4,7 @@
   "description": "backend for sorting application",
   "main": "index.js",
   "scripts": {
-    "server": "nodemon server.js"
+    "server": "nodemon ./src/server.js"
   },
   "repository": {
     "type": "git",

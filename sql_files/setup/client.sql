@@ -1,0 +1,1 @@
+CREATE USER yorita_app;
