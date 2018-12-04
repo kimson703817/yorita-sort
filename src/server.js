@@ -18,6 +18,14 @@ app.use(bodyParser.json());
 */
 app.use('/api/user', routes.user);
 
+// Passport middleware
+app.use(passport.initialize());
+
+// Passport Config
+require('../config/passport.js');
+
 const port = process.env.PORT || 5000;
+
+
 
 app.listen(port, () => console.log(`Server is listening on port ${port}`));

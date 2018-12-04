@@ -1,10 +1,13 @@
 const express = require('express');
-const { Client } = require('pg');
+// const { Client } = require('pg');
 
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 
 const db_secret = require('../../../config/keys').PG;
+const privateKey = require('../../../config/keys').private;
+const pgQueryHandler = require('../../utils/postgres').pgQueryHandler;
+const pgErrorHandler = require('../../utils/postgres').pgErrorHandler;
 
 const router = express.Router();
 
@@ -22,74 +25,81 @@ router.get('/register', (req, res) => {
 // @route   POST /api/users/register
 // @desc    Submit registration
 // @access  Public
-router.post('/register', (req, res) => {
-    // Items to INSERT
+router.post('/register', async(req, res) => {
     const email = req.body.email;
     const password = req.body.password;
-
     const sql_insert = `
-        INSERT INTO users (email, password) VALUES (
+        INSERT INTO users (email, password)
+          VALUES (
             '${email}',
-            crypt('${password}', gen_salt('bf'))
+            crypt('${password}', gen_salt('bf')
+          )
         );
     `;
-    
-    
-    pgQueryHandler(db_secret, sql_insert, res);
-
-    // try {
-    //     await client.connect();
-    //     const dbRes = await client.query(db_registerNewUser);
-    //     res.send(dbRes);
-    // } catch (err) {
-    //     // Check if postgres returned an error code
-    //     switch(err.code) {
-    //         case '23505':
-    //             res.status(422)
-    //                 .send('This email is already registered');
-    //             break;
-    //         default:
-    //             res.status(500).send(err.message);
-    //             break;
-    //     };
-    // }
-
+    try {
+        await pgQueryHandler(
+            db_secret,
+            sql_insert,
+        );
+        res.status(201).send('Successfully registered');
+    } catch(err) {
+        pgErrorHandler(err, res);
+    }
 });
 
 // @route   POST /api/user/login
 // @desc    Login User / Returns Web Token
 // @access  Public
 router.post('/login', async(req, res) => {
-    const db_getUserId = `
-        SELECT id
+    const sql_getUserId = `
+        SELECT id, email
             FROM users
           WHERE email = '${req.body.email}'
-            AND password = crypt('${req.body.password}');
+            AND password = crypt('${req.body.password}', password);
     `;
+
+    try {
+        dbRes = await pgQueryHandler(
+            db_secret,
+            sql_getUserId,
+        );
+        //console.log(dbRes.rows[0].email);
+        //if(dbRes.rows ===)
+        if(dbRes.rows.length === 0) throw err;
+        const payload = {
+            id: dbRes.rows[0].id,
+            email: dbRes.rows[0].email
+        };
+        jwt.sign(
+            payload,
+            privateKey,
+            { expiresIn: 86400 },
+            (err, token) => {
+                res.json({
+                    success: true,
+                    token: 'Bearer ' + token
+                });
+            }
+        );
+    } catch (err) {
+        err.status = 401;
+        err.message = 'Invalid login credentials';
+        pgErrorHandler(err, res);
+    }
 });
+
+// @route   GET /api/user/current
+// @desc    Return current user
+// @access  Private
+router.get('/current',
+    passport.authenticate('jwt', { session: false}),
+    (req, res) => {
+        res.json(req.user);
+    });
 
 /*************************************************
 **************** HELPER FUNCTIONS ****************
 *************************************************/
-const pgQueryHandler = async(pg_secret, queryString, res) => {
-    const client = new Client(pg_secret);
 
-    try {
-        await client.connect();
-        await client.query(queryString);
-        res.status(201).send('Account created');
-    } catch (err) {
-        // Check if postgres returned an error code
-        switch(err.code) {
-            case '23505':
-                res.status(422)
-                    .send('This email is already registered');
-                break;
-            default:
-                res.status(500).send(err.message);
-                break;
-        };
-    }
-};
 
 module.exports = router;
