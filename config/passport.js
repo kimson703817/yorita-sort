@@ -5,8 +5,10 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const keys = require('./keys');
 
-const pgQueryHandler = require('../src/utils/postgres').pgQueryHandler;
-const pgErrorHandler = require('../src/utils/postgres').pgErrorHandler;
+const pgQueryHandler = require('../src/postgres/postgres').pgQueryHandler;
+const pgErrorHandler = require('../src/postgres/postgres').pgErrorHandler;
+
+const usersTbl = require('../src/postgres/models/producers');
 
 // passport.use(
 //     new GoogleStrategy({
@@ -24,17 +26,17 @@ passport.use(
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         secretOrKey: keys.private
     }, async(jwtPayload, done) => {
-        const sql_userSelectEmail = `
-            SELECT email from users
-                WHERE id = ${jwtPayload.id} ;
+        const sql_selectProducer = `
+            SELECT id, username, email from ${usersTbl.name}
+                WHERE id = '${jwtPayload.id}';
         `;
         try {
             dbRes = await pgQueryHandler(
                 keys.PG,
-                sql_userSelectEmail
+                sql_selectProducer
             );
-            user = dbRes.rows[0];
-            if(dbRes.rows.length) return done(null, user);
+            producer = dbRes.rows[0];
+            if(dbRes.rows.length) return done(null, producer);
             return done(null, false);
             
         } catch(err) {

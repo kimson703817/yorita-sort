@@ -1,5 +1,5 @@
-const user = require('./api/user');
+const producer = require('./api/producer');
 
 module.exports = {
-    user: user
+    producer: producer
 };

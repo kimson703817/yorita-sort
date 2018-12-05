@@ -6,8 +6,10 @@ const passport = require('passport');
 
 const db_secret = require('../../../config/keys').PG;
 const privateKey = require('../../../config/keys').private;
-const pgQueryHandler = require('../../utils/postgres').pgQueryHandler;
-const pgErrorHandler = require('../../utils/postgres').pgErrorHandler;
+const pgQueryHandler = require('../../postgres/postgres').pgQueryHandler;
+const pgErrorHandler = require('../../postgres/postgres').pgErrorHandler;
+
+const usersTbl = require('../../postgres/models/producers');
 
 const router = express.Router();
 
@@ -15,24 +17,24 @@ router.get('/hello', (req, res) => {
     res.send('Hello Yoshino!');
 });
 
-// @route   GET /api/users/register
+// @route   GET /api/producer/register
 // @desc    Page that contains the form for user registration
 // @access  Public
 router.get('/register', (req, res) => {
     res.send('register page');
 });
 
-// @route   POST /api/users/register
+// @route   POST /api/producer/register
 // @desc    Submit registration
 // @access  Public
 router.post('/register', async(req, res) => {
-    const email = req.body.email;
-    const password = req.body.password;
     const sql_insert = `
-        INSERT INTO users (email, password)
+        INSERT INTO
+            ${usersTbl.name} (username, email, password)
           VALUES (
-            '${email}',
-            crypt('${password}', gen_salt('bf')
+            '${req.body.username}',
+            '${req.body.email}',
+            crypt('${req.body.password}', gen_salt('bf')
           )
         );
     `;
@@ -43,17 +45,19 @@ router.post('/register', async(req, res) => {
         );
         res.status(201).send('Successfully registered');
     } catch(err) {
+        err.Objective = 'Registration';
+        if(!err.column) err.column = 'email';
         pgErrorHandler(err, res);
     }
 });
 
-// @route   POST /api/user/login
+// @route   POST /api/producer/login
 // @desc    Login User / Returns Web Token
 // @access  Public
 router.post('/login', async(req, res) => {
-    const sql_getUserId = `
-        SELECT id, email
-            FROM users
+    const sql_getUser = `
+        SELECT id, username, email
+            FROM ${usersTbl.name}
           WHERE email = '${req.body.email}'
             AND password = crypt('${req.body.password}', password);
     `;
@@ -61,13 +65,14 @@ router.post('/login', async(req, res) => {
     try {
         dbRes = await pgQueryHandler(
             db_secret,
-            sql_getUserId,
+            sql_getUser,
         );
-        //console.log(dbRes.rows[0].email);
-        //if(dbRes.rows ===)
+        // console.log(dbRes.rows[0].email);
+        // if(dbRes.rows ===)
         if(dbRes.rows.length === 0) throw err;
         const payload = {
             id: dbRes.rows[0].id,
+            username: dbRes.rows[0].username,
             email: dbRes.rows[0].email
         };
         jwt.sign(
@@ -82,13 +87,11 @@ router.post('/login', async(req, res) => {
             }
         );
     } catch (err) {
-        err.status = 401;
-        err.message = 'Invalid login credentials';
         pgErrorHandler(err, res);
     }
 });
 
-// @route   GET /api/user/current
+// @route   GET /api/producer/current
 // @desc    Return current user
 // @access  Private
 router.get('/current',

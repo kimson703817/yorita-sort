@@ -13,10 +13,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 /* Use Routes
-    - user
+    - producer
     - profile
 */
-app.use('/api/user', routes.user);
+app.use('/api/producer', routes.producer);
+
 
 // Passport middleware
 app.use(passport.initialize());

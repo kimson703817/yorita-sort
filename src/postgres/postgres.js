@@ -14,10 +14,19 @@ const pgQueryHandler = async(pg_secret, queryString) => {
 
 const pgErrorHandler = (err, res) => {
     // Check if postgres returned an error code
+    // console.log(err);
     switch(err.code) {
+        case '23502':
+            res.status(422);
+            //err.pgSummary = 'MISSING REQUIRED';
+            res.json({
+                msg: `${err.Objective} error: ${err.column} is required`
+            });
+            break;
         case '23505':
             res.status(422);
-            res.send('This email is already registered');
+            //err.pgSummary = 'DUPLICATE';
+            res.json({msg: `${err.Objective} error: ${err.column} already exists`});
             break;
         default:
             res.status(err.status || 500).send(err.message);
