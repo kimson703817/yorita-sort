@@ -65,3 +65,5 @@ config/keys.js
 
 # database admin
 admin.sql
+
+.vscode/

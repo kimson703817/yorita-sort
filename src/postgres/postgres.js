@@ -29,7 +29,7 @@ const pgErrorHandler = (err, res) => {
             res.json({msg: `${err.Objective} error: ${err.column} already exists`});
             break;
         default:
-            res.status(err.status || 500).send(err.message);
+            res.status(err.status || 500).json(err.message);
             break;
     };
 }
