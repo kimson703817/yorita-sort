@@ -18,6 +18,8 @@ app.use(bodyParser.json());
 */
 app.use('/api/producer', routes.producer);
 
+app.use('/admin', routes.admin);
+
 
 // Passport middleware
 app.use(passport.initialize());

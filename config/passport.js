@@ -27,7 +27,7 @@ passport.use(
         secretOrKey: keys.private
     }, async(jwtPayload, done) => {
         const sql_selectProducer = `
-            SELECT id, username, email from ${usersTbl.name}
+            SELECT id, username, email, admin from ${usersTbl.name}
                 WHERE id = '${jwtPayload.id}';
         `;
         try {

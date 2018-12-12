@@ -14,19 +14,21 @@ const pgQueryHandler = async(pg_secret, queryString) => {
 
 const pgErrorHandler = (err, res) => {
     // Check if postgres returned an error code
-    // console.log(err);
+    console.log(err);
     switch(err.code) {
         case '23502':
             res.status(422);
             //err.pgSummary = 'MISSING REQUIRED';
             res.json({
-                msg: `${err.Objective} error: ${err.column} is required`
+                message: `Error: ${err.column.toUpperCase()} is required to ${err.Objective}`
             });
             break;
         case '23505':
             res.status(422);
             //err.pgSummary = 'DUPLICATE';
-            res.json({msg: `${err.Objective} error: ${err.column} already exists`});
+            res.json({
+                message: `Error: this ${err.column.toUpperCase()} already exists, unable to ${err.Objective}`
+            });
             break;
         default:
             res.status(err.status || 500).json(err.message);

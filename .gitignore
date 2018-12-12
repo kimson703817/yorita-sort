@@ -67,3 +67,5 @@ config/keys.js
 admin.sql
 
 .vscode/
+
+pgenv.sh

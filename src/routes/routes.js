@@ -1,5 +1,7 @@
 const producer = require('./api/producer');
+const admin = require('./site-admin/admin');
 
 module.exports = {
-    producer: producer
+    producer: producer,
+    admin: admin
 };

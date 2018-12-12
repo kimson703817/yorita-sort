@@ -14,5 +14,16 @@
 --     username VARCHAR(20) NOT NULL,
 --     email VARCHAR NOT NULL UNIQUE,
 --     password VARCHAR NOT NULL,
---     PRIMARY KEY (producer_id)
+--     admin BOOLEAN DEFAULT FALSE,
+--     PRIMARY KEY (id)
 -- );
+
+-- select producers.table_schema, producers.table_name, kc.column_name
+-- from information_schema.table_constraints producers
+--   join information_schema.key_column_usage kc 
+--     on kc.table_name = producers.table_name and kc.table_schema = producers.table_schema and kc.constraint_name = producers.constraint_name
+-- where producers.constraint_type = 'PRIMARY KEY'
+--   and kc.ordinal_position is not null
+-- order by producers.table_schema,
+--          producers.table_name,
+--          kc.position_in_unique_constraint;

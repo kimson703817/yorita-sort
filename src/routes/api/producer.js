@@ -1,5 +1,4 @@
 const express = require('express');
-// const { Client } = require('pg');
 
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
@@ -55,7 +54,7 @@ router.post('/register', async(req, res) => {
         );
         res.status(201).send('Successfully registered');
     } catch(err) {
-        err.Objective = 'Registration';
+        err.Objective = 'register';
         if(!err.column) err.column = 'email';
         pgErrorHandler(err, res);
     }
@@ -71,7 +70,7 @@ router.post('/login', async(req, res) => {
         return res.status(400).json(errors);
     }
     const sql_getUser = `
-        SELECT id, username, email
+        SELECT id, username, email, admin
             FROM ${usersTbl.name}
           WHERE email = '${req.body.email}'
             AND password = crypt('${req.body.password}', password);
@@ -90,7 +89,7 @@ router.post('/login', async(req, res) => {
         const payload = {
             id: dbRes.rows[0].id,
             username: dbRes.rows[0].username,
-            email: dbRes.rows[0].email
+            email: dbRes.rows[0].email,
         };
         jwt.sign(
             payload,
